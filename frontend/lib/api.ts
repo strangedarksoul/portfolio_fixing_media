@@ -89,9 +89,6 @@ export const projectsAPI = {
   getSkillProjects: (slug: string) => api.get(`/api/v1/projects/skills/${slug}/projects`),
   getCaseStudies: (params?: any) => api.get('/api/v1/projects/casestudies/', { params }),
   getCaseStudy: (id: number) => api.get(`/api/v1/projects/casestudies/${id}`),
-  createProject: (data: any) => api.post('/api/v1/projects/admin/projects/create', data),
-  updateProject: (id: string, data: any) => api.put(`/api/v1/projects/admin/projects/${id}`, data),
-  deleteProject: (id: string) => api.delete(`/api/v1/projects/admin/projects/${id}`),
 };
 
 export const chatAPI = {
