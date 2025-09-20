@@ -146,32 +146,6 @@ class AdminProjectCreateView(generics.CreateAPIView):
     permission_classes = [IsAdminUser]
     queryset = Project.objects.all()
     serializer_class = ProjectCreateUpdateSerializer
-    
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            project = serializer.save()
-            
-            # Track project creation
-            AnalyticsEvent.objects.create(
-                event_type='admin_project_created',
-                user=request.user,
-                session_id=request.session.session_key,
-                metadata={
-                    'project_id': project.id,
-                    'project_title': project.title,
-                    'visibility': project.visibility,
-                    'is_featured': project.is_featured,
-                }
-            )
-            
-            return Response({
-                'id': project.id,
-                'message': 'Project created successfully',
-                'project': ProjectDetailSerializer(project, context={'request': request}).data
-            }, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AdminProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -185,52 +159,3 @@ class AdminProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
             # Use detail serializer for GET requests
             kwargs['serializer_class'] = ProjectDetailSerializer
         return super().get_serializer(*args, **kwargs)
-    
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        
-        if serializer.is_valid():
-            project = serializer.save()
-            
-            # Track project update
-            AnalyticsEvent.objects.create(
-                event_type='admin_project_updated',
-                user=request.user,
-                session_id=request.session.session_key,
-                metadata={
-                    'project_id': project.id,
-                    'project_title': project.title,
-                    'updated_fields': list(request.data.keys()),
-                }
-            )
-            
-            return Response({
-                'id': project.id,
-                'message': 'Project updated successfully',
-                'project': ProjectDetailSerializer(project, context={'request': request}).data
-            })
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        project_id = instance.id
-        project_title = instance.title
-        
-        # Track project deletion
-        AnalyticsEvent.objects.create(
-            event_type='admin_project_deleted',
-            user=request.user,
-            session_id=request.session.session_key,
-            metadata={
-                'project_id': project_id,
-                'project_title': project_title,
-            }
-        )
-        
-        self.perform_destroy(instance)
-        return Response({
-            'message': 'Project deleted successfully'
-        }, status=status.HTTP_204_NO_CONTENT)

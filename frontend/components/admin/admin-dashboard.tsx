@@ -492,21 +492,6 @@ export function AdminDashboard() {
     setShowGigDialog(true);
   };
 
-  const handleDeleteProject = async (project: Project) => {
-    if (!confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone.`)) {
-      return;
-    }
-
-    try {
-      await projectsAPI.deleteProject(project.id);
-      setMessage({ type: 'success', text: 'Project deleted successfully!' });
-      loadAdminData(); // Reload data
-    } catch (error) {
-      console.error('Failed to delete project:', error);
-      setMessage({ type: 'error', text: 'Failed to delete project' });
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-blue-500/20 text-blue-400';
@@ -745,7 +730,6 @@ export function AdminDashboard() {
                           variant="ghost"
                           size="sm"
                           className="text-red-400 hover:text-red-300"
-                          onClick={() => handleDeleteProject(project)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -1061,6 +1045,73 @@ export function AdminDashboard() {
           </DialogHeader>
 
           <form onSubmit={projectForm.handleSubmit(selectedProject ? handleUpdateProject : handleCreateProject)} className="space-y-6">
+            {/* Media Preview Section */}
+            {selectedProject && (selectedProject.hero_image || selectedProject.hero_video || (selectedProject.gallery_images && selectedProject.gallery_images.length > 0)) && (
+              <Card className="bg-muted/30">
+                <CardHeader>
+                  <CardTitle className="text-lg">Current Media</CardTitle>
+                  <CardDescription>
+                    Existing media files for this project
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {selectedProject.hero_image && (
+                    <div>
+                      <Label className="text-sm font-medium">Current Hero Image</Label>
+                      <div className="aspect-video w-full max-w-sm overflow-hidden rounded-lg border mt-2">
+                        <img
+                          src={selectedProject.hero_image}
+                          alt="Current hero image"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedProject.hero_video && (
+                    <div>
+                      <Label className="text-sm font-medium">Current Hero Video</Label>
+                      <div className="flex items-center gap-2 mt-2">
+                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                        <a 
+                          href={selectedProject.hero_video} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-400 hover:underline truncate"
+                        >
+                          {selectedProject.hero_video}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedProject.gallery_images && selectedProject.gallery_images.length > 0 && (
+                    <div>
+                      <Label className="text-sm font-medium">Current Gallery ({selectedProject.gallery_images.length} images)</Label>
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        {selectedProject.gallery_images.slice(0, 6).map((image, index) => (
+                          <div key={index} className="aspect-square overflow-hidden rounded border">
+                            <img
+                              src={image}
+                              alt={`Gallery ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ))}
+                        {selectedProject.gallery_images.length > 6 && (
+                          <div className="aspect-square border rounded flex items-center justify-center bg-muted">
+                            <span className="text-xs text-muted-foreground">
+                              +{selectedProject.gallery_images.length - 6}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Project Title *</Label>
