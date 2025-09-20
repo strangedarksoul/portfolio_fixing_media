@@ -371,7 +371,7 @@ export function ProjectDetail({ slug }: ProjectDetailProps) {
                     variant="ghost"
                     size="lg"
                     onClick={handleShare}
-                  >
+                      window.open(project.live_demo_url!, '_blank');
                     <Share2 className="w-5 h-5 mr-2" />
                     Share
                   </Button>

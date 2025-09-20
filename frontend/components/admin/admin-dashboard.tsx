@@ -257,9 +257,9 @@ export function AdminDashboard() {
       short_description: '',
       long_description: '',
       price_min: 0,
-      price_max: 0,
+      price_max: undefined,
       delivery_time_min: 1,
-      delivery_time_max: 1,
+      delivery_time_max: undefined,
       delivery_time_unit: 'weeks',
       status: 'open',
       is_featured: false,
@@ -1081,22 +1081,22 @@ export function AdminDashboard() {
                       </div>
                     </div>
                   )}
-                  
+                  {selectedProject?.hero_image && (
                   {selectedProject.hero_video && (
                     <div>
                       <Label className="text-sm font-medium">Current Hero Video</Label>
-                      <div className="flex items-center gap-2 mt-2">
+                        <img src={selectedProject.hero_image} alt="Hero" className="w-full h-full object-cover" />
                         <ExternalLink className="w-4 h-4 text-muted-foreground" />
                         <a 
                           href={selectedProject.hero_video} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-400 hover:underline truncate"
+                  {selectedProject?.hero_video && (
                         >
                           {selectedProject.hero_video}
                         </a>
                       </div>
-                    </div>
+                        <Button size="sm" variant="ghost" onClick={() => window.open(selectedProject.hero_video!, '_blank')}>
                   )}
                   
                   {selectedProject.gallery_images && selectedProject.gallery_images.length > 0 && (
@@ -1104,19 +1104,19 @@ export function AdminDashboard() {
                       <Label className="text-sm font-medium">Current Gallery ({selectedProject.gallery_images.length} images)</Label>
                       <div className="grid grid-cols-3 gap-2 mt-2">
                         {selectedProject.gallery_images.slice(0, 6).map((image, index) => (
-                          <div key={index} className="aspect-square overflow-hidden rounded border">
+                  {selectedProject?.gallery_images && selectedProject.gallery_images.length > 0 && (
                             <img
                               src={image}
-                              alt={`Gallery ${index + 1}`}
+                      <div className="grid grid-cols-3 gap-2">{selectedProject.gallery_images.slice(0, 6).map((image: string, index: number) => (
                               className="w-full h-full object-cover"
-                            />
+                            <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
                           </div>
                         ))}
                         {selectedProject.gallery_images.length > 6 && (
                           <div className="aspect-square border rounded flex items-center justify-center bg-muted">
                             <span className="text-xs text-muted-foreground">
                               +{selectedProject.gallery_images.length - 6}
-                            </span>
+                            <span className="text-xs">+{selectedProject.gallery_images.length - 6} more</span>
                           </div>
                         )}
                       </div>

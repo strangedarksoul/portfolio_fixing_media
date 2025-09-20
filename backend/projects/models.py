@@ -210,7 +210,7 @@ class ProjectCollaboration(TimeStampedModel):
     role = models.CharField(max_length=255)
     contribution = models.TextField(blank=True, help_text="What they contributed to the project")
     profile_url = models.URLField(blank=True, help_text="LinkedIn, GitHub, or portfolio URL")
-    avatar = VersatileImageField(upload_to='collaborators/', null=True, blank=True)
+    avatar = models.URLField(blank=True, help_text="Avatar image URL")
     order = models.PositiveIntegerField(default=0)
     
     class Meta:

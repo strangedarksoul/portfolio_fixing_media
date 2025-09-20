@@ -95,7 +95,7 @@ class Testimonial(TimeStampedModel):
     author_name = models.CharField(max_length=255)
     author_role = models.CharField(max_length=255, blank=True)
     author_company = models.CharField(max_length=255, blank=True)
-    author_image = VersatileImageField(upload_to='testimonials/', null=True, blank=True)
+    author_image = models.URLField(blank=True, help_text="Author image URL")
     content = models.TextField()
     rating = models.PositiveSmallIntegerField(
         choices=[(i, i) for i in range(1, 6)], 
