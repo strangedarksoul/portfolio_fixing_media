@@ -141,13 +141,8 @@ interface Project {
   start_date: string;
   end_date?: string;
   is_ongoing: boolean;
-  hero_image?: string;
-  hero_video?: string;
-  gallery_images?: string[];
   repo_url?: string;
   live_demo_url?: string;
-  case_study_url?: string;
-  metrics?: Record<string, any>;
   visibility: string;
   is_featured: boolean;
   order: number;
@@ -497,6 +492,21 @@ export function AdminDashboard() {
     setShowGigDialog(true);
   };
 
+  const handleDeleteProject = async (project: Project) => {
+    if (!confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await projectsAPI.deleteProject(project.id);
+      setMessage({ type: 'success', text: 'Project deleted successfully!' });
+      loadAdminData(); // Reload data
+    } catch (error) {
+      console.error('Failed to delete project:', error);
+      setMessage({ type: 'error', text: 'Failed to delete project' });
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-blue-500/20 text-blue-400';
@@ -735,6 +745,7 @@ export function AdminDashboard() {
                           variant="ghost"
                           size="sm"
                           className="text-red-400 hover:text-red-300"
+                          onClick={() => handleDeleteProject(project)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
