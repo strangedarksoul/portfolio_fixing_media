@@ -296,36 +296,6 @@ export function AdminDashboard() {
   }, [user, loadAdminData]);
 
   const handleSendNotification = async () => {
-      let uploadedHeroImageUrl = data.hero_image;
-      
-      // Upload hero image if a new file was selected
-      if (heroImageFile) {
-        const formData = new FormData();
-        formData.append('file', heroImageFile);
-        formData.append('type', 'project');
-        
-        const uploadResponse = await fileUploadAPI.uploadFile(formData);
-        uploadedHeroImageUrl = uploadResponse.data.file.url;
-      }
-      
-      // Process gallery images from textarea
-      const galleryUrls = data.gallery_images_text
-        ? data.gallery_images_text
-            .split('\n')
-            .map((url: string) => url.trim())
-            .filter((url: string) => url.length > 0)
-        : [];
-      
-      // Parse metrics JSON
-      let parsedMetrics = {};
-      if (data.metrics) {
-        try {
-          parsedMetrics = JSON.parse(data.metrics);
-        } catch (error) {
-          throw new Error('Invalid JSON format in metrics field');
-        }
-      }
-      
     if (!notificationForm.title || !notificationForm.body) return;
 
     setIsSubmitting(true);
@@ -445,8 +415,6 @@ export function AdminDashboard() {
 
       await projectsAPI.updateProject(selectedProject.id, data);
       setMessage({ type: 'success', text: 'Project updated successfully!' });
-      setHeroImageFile(null);
-      setHeroImagePreview('');
       setShowProjectDialog(false);
       setSelectedProject(null);
       setHeroImageFile(null);
@@ -471,7 +439,7 @@ export function AdminDashboard() {
       setShowGigDialog(false);
       gigForm.reset();
       loadAdminData(); // Reload data
-        text: error.message || error.response?.data?.message || 'Failed to save project' 
+    } catch (error) {
       setMessage({ type: 'error', text: 'Failed to create service' });
     } finally {
       setIsSubmitting(false);
