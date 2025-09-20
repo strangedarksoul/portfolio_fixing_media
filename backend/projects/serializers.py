@@ -112,41 +112,6 @@ class ProjectCreateUpdateSerializer(serializers.ModelSerializer):
             'skill_ids'
         ]
     
-    def validate_gallery_images(self, value):
-        """Validate gallery images list"""
-        if not isinstance(value, list):
-            raise serializers.ValidationError("Gallery images must be a list of URLs")
-        
-        from django.core.validators import URLValidator
-        url_validator = URLValidator()
-        
-        for url in value:
-            if not isinstance(url, str):
-                raise serializers.ValidationError("All gallery images must be valid URLs")
-            try:
-                url_validator(url)
-            except:
-                raise serializers.ValidationError(f"Invalid URL: {url}")
-        
-        return value
-    
-    def validate_metrics(self, value):
-        """Validate metrics JSON"""
-        if value is None:
-            return {}
-        
-        if isinstance(value, str):
-            try:
-                import json
-                return json.loads(value)
-            except json.JSONDecodeError:
-                raise serializers.ValidationError("Invalid JSON format for metrics")
-        
-        if isinstance(value, dict):
-            return value
-        
-        raise serializers.ValidationError("Metrics must be a valid JSON object")
-    
     def create(self, validated_data):
         skill_ids = validated_data.pop('skill_ids', [])
         project = Project.objects.create(**validated_data)
