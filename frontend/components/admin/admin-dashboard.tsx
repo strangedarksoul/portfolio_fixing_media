@@ -141,8 +141,13 @@ interface Project {
   start_date: string;
   end_date?: string;
   is_ongoing: boolean;
+  hero_image?: string;
+  hero_video?: string;
+  gallery_images?: string[];
   repo_url?: string;
   live_demo_url?: string;
+  case_study_url?: string;
+  metrics?: Record<string, any>;
   visibility: string;
   is_featured: boolean;
   order: number;
