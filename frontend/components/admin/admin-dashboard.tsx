@@ -20,6 +20,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useAuthStore } from '@/lib/store';
 import { adminAPI, projectsAPI, gigsAPI } from '@/lib/api';
+import { fileUploadAPI } from '@/lib/api';
 import { analytics } from '@/lib/analytics';
 import { 
   BarChart3, 
@@ -72,7 +73,7 @@ const projectSchema = z.object({
   live_demo_url: z.string().url().optional().or(z.literal('')),
   case_study_url: z.string().url().optional().or(z.literal('')),
   visibility: z.string(),
-  is_featured: z.boolean(),
+  skill_ids: z.array(z.string()).optional(),
   order: z.number().min(0),
   skill_ids: z.array(z.string()).optional(),
   metrics: z.string().optional(),
@@ -137,9 +138,18 @@ interface Project {
   short_tagline: string;
   description_short: string;
   description_long: string;
+  description_long: string;
   role: string;
   start_date: string;
   end_date?: string;
+  is_ongoing: boolean;
+  hero_image?: string;
+  hero_video?: string;
+  gallery_images: string[];
+  repo_url?: string;
+  live_demo_url?: string;
+  case_study_url?: string;
+  metrics: Record<string, any>;
   is_ongoing: boolean;
   repo_url?: string;
   live_demo_url?: string;
@@ -149,6 +159,10 @@ interface Project {
   skills: Array<{ id: string; name: string }>;
   view_count: number;
   created_at: string;
+  visibility: string;
+  order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Gig {
@@ -230,7 +244,7 @@ export function AdminDashboard() {
       visibility: 'public',
       is_featured: false,
       order: 0,
-      skill_ids: [],
+      skill_ids: [] as string[],
       metrics: '',
     },
   });
