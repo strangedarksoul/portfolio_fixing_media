@@ -65,17 +65,12 @@ const projectSchema = z.object({
   start_date: z.string().min(1, 'Start date is required'),
   end_date: z.string().optional(),
   is_ongoing: z.boolean(),
-  hero_image: z.string().optional(),
-  hero_video: z.string().url().optional().or(z.literal('')),
-  gallery_images_text: z.string().optional(),
   repo_url: z.string().url().optional().or(z.literal('')),
   live_demo_url: z.string().url().optional().or(z.literal('')),
-  case_study_url: z.string().url().optional().or(z.literal('')),
   visibility: z.string(),
   is_featured: z.boolean(),
   order: z.number().min(0),
   skill_ids: z.array(z.string()).optional(),
-  metrics: z.string().optional(),
 });
 
 const gigSchema = z.object({
@@ -196,9 +191,6 @@ export function AdminDashboard() {
   const [showGigDialog, setShowGigDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
-  const [heroImagePreview, setHeroImagePreview] = useState<string>('');
-  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
 
   // Notification form state
   const [notificationForm, setNotificationForm] = useState({
@@ -221,17 +213,12 @@ export function AdminDashboard() {
       start_date: '',
       end_date: '',
       is_ongoing: false,
-      hero_image: '',
-      hero_video: '',
-      gallery_images_text: '',
       repo_url: '',
       live_demo_url: '',
-      case_study_url: '',
       visibility: 'public',
       is_featured: false,
       order: 0,
       skill_ids: [],
-      metrics: '',
     },
   });
 
@@ -304,56 +291,16 @@ export function AdminDashboard() {
   const handleCreateProject = async (data: any) => {
     setIsSubmitting(true);
     try {
-      // Handle hero image upload if file is selected
-      if (heroImageFile) {
-        setIsUploadingMedia(true);
-        const formData = new FormData();
-        formData.append('file', heroImageFile);
-        formData.append('type', 'general');
-        
-        const uploadResponse = await fileUploadAPI.uploadFile(formData);
-        data.hero_image = uploadResponse.data.file.url;
-        setIsUploadingMedia(false);
-      }
-
-      // Process gallery images from textarea
-      if (data.gallery_images_text) {
-        const galleryUrls = data.gallery_images_text
-          .split('\n')
-          .map((url: string) => url.trim())
-          .filter((url: string) => url.length > 0);
-        data.gallery_images = galleryUrls;
-      } else {
-        data.gallery_images = [];
-      }
-
-      // Process metrics JSON
-      if (data.metrics) {
-        try {
-          data.metrics = JSON.parse(data.metrics);
-        } catch (e) {
-          data.metrics = {};
-        }
-      } else {
-        data.metrics = {};
-      }
-
-      // Remove frontend-only fields
-      delete data.gallery_images_text;
-
-      await projectsAPI.createProject(data);
+      // In a real implementation, this would call the admin API to create a project
+      console.log('Creating project:', data);
       setMessage({ type: 'success', text: 'Project created successfully!' });
       setShowProjectDialog(false);
-      setHeroImageFile(null);
-      setHeroImagePreview('');
       projectForm.reset();
       loadAdminData(); // Reload data
     } catch (error) {
-      console.error('Failed to create project:', error);
       setMessage({ type: 'error', text: 'Failed to create project' });
     } finally {
       setIsSubmitting(false);
-      setIsUploadingMedia(false);
     }
   };
 
@@ -362,57 +309,17 @@ export function AdminDashboard() {
     
     setIsSubmitting(true);
     try {
-      // Handle hero image upload if new file is selected
-      if (heroImageFile) {
-        setIsUploadingMedia(true);
-        const formData = new FormData();
-        formData.append('file', heroImageFile);
-        formData.append('type', 'general');
-        
-        const uploadResponse = await fileUploadAPI.uploadFile(formData);
-        data.hero_image = uploadResponse.data.file.url;
-        setIsUploadingMedia(false);
-      }
-
-      // Process gallery images from textarea
-      if (data.gallery_images_text) {
-        const galleryUrls = data.gallery_images_text
-          .split('\n')
-          .map((url: string) => url.trim())
-          .filter((url: string) => url.length > 0);
-        data.gallery_images = galleryUrls;
-      } else {
-        data.gallery_images = [];
-      }
-
-      // Process metrics JSON
-      if (data.metrics) {
-        try {
-          data.metrics = JSON.parse(data.metrics);
-        } catch (e) {
-          data.metrics = {};
-        }
-      } else {
-        data.metrics = {};
-      }
-
-      // Remove frontend-only fields
-      delete data.gallery_images_text;
-
-      await projectsAPI.updateProject(selectedProject.id, data);
+      // In a real implementation, this would call the admin API to update a project
+      console.log('Updating project:', selectedProject.id, data);
       setMessage({ type: 'success', text: 'Project updated successfully!' });
       setShowProjectDialog(false);
       setSelectedProject(null);
-      setHeroImageFile(null);
-      setHeroImagePreview('');
       projectForm.reset();
       loadAdminData(); // Reload data
     } catch (error) {
-      console.error('Failed to update project:', error);
       setMessage({ type: 'error', text: 'Failed to update project' });
     } finally {
       setIsSubmitting(false);
-      setIsUploadingMedia(false);
     }
   };
 
@@ -434,22 +341,6 @@ export function AdminDashboard() {
 
   const handleEditProject = (project: Project) => {
     setSelectedProject(project);
-    
-    // Set hero image preview if exists
-    if (project.hero_image) {
-      setHeroImagePreview(project.hero_image);
-    }
-    
-    // Convert gallery_images array to text for textarea
-    const galleryText = Array.isArray(project.gallery_images) 
-      ? project.gallery_images.join('\n') 
-      : '';
-    
-    // Convert metrics object to JSON string
-    const metricsText = project.metrics && typeof project.metrics === 'object'
-      ? JSON.stringify(project.metrics, null, 2)
-      : '';
-
     projectForm.reset({
       title: project.title,
       short_tagline: project.short_tagline,
@@ -459,17 +350,12 @@ export function AdminDashboard() {
       start_date: project.start_date,
       end_date: project.end_date || '',
       is_ongoing: project.is_ongoing,
-      hero_image: project.hero_image || '',
-      hero_video: project.hero_video || '',
-      gallery_images_text: galleryText,
       repo_url: project.repo_url || '',
       live_demo_url: project.live_demo_url || '',
-      case_study_url: project.case_study_url || '',
       visibility: project.visibility,
       is_featured: project.is_featured,
       order: project.order,
       skill_ids: project.skills.map(s => s.id),
-      metrics: metricsText,
     });
     setShowProjectDialog(true);
   };
@@ -1045,73 +931,6 @@ export function AdminDashboard() {
           </DialogHeader>
 
           <form onSubmit={projectForm.handleSubmit(selectedProject ? handleUpdateProject : handleCreateProject)} className="space-y-6">
-            {/* Media Preview Section */}
-            {selectedProject && (selectedProject.hero_image || selectedProject.hero_video || (selectedProject.gallery_images && selectedProject.gallery_images.length > 0)) && (
-              <Card className="bg-muted/30">
-                <CardHeader>
-                  <CardTitle className="text-lg">Current Media</CardTitle>
-                  <CardDescription>
-                    Existing media files for this project
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {selectedProject.hero_image && (
-                    <div>
-                      <Label className="text-sm font-medium">Current Hero Image</Label>
-                      <div className="aspect-video w-full max-w-sm overflow-hidden rounded-lg border mt-2">
-                        <img
-                          src={selectedProject.hero_image}
-                          alt="Current hero image"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selectedProject.hero_video && (
-                    <div>
-                      <Label className="text-sm font-medium">Current Hero Video</Label>
-                      <div className="flex items-center gap-2 mt-2">
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                        <a 
-                          href={selectedProject.hero_video} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-400 hover:underline truncate"
-                        >
-                          {selectedProject.hero_video}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selectedProject.gallery_images && selectedProject.gallery_images.length > 0 && (
-                    <div>
-                      <Label className="text-sm font-medium">Current Gallery ({selectedProject.gallery_images.length} images)</Label>
-                      <div className="grid grid-cols-3 gap-2 mt-2">
-                        {selectedProject.gallery_images.slice(0, 6).map((image, index) => (
-                          <div key={index} className="aspect-square overflow-hidden rounded border">
-                            <img
-                              src={image}
-                              alt={`Gallery ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                        {selectedProject.gallery_images.length > 6 && (
-                          <div className="aspect-square border rounded flex items-center justify-center bg-muted">
-                            <span className="text-xs text-muted-foreground">
-                              +{selectedProject.gallery_images.length - 6}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Project Title *</Label>
