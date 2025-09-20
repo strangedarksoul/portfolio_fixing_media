@@ -57,8 +57,7 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('role', 'start_date', 'end_date', 'is_ongoing', 'skills')
         }),
         ('Media', {
-            'fields': ('hero_image', 'hero_video', 'gallery_images'),
-            'description': 'Hero image should be a URL, gallery_images should be a JSON list of URLs'
+            'fields': ('hero_image', 'hero_video', 'gallery_images')
         }),
         ('Links', {
             'fields': ('repo_url', 'live_demo_url', 'case_study_url')

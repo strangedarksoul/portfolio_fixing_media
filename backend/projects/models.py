@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from ckeditor.fields import RichTextField
+from versatileimagefield.fields import VersatileImageField
 from core.models import TimeStampedModel, SEOModel
 import json
 
@@ -73,7 +75,7 @@ class Project(TimeStampedModel, SEOModel):
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     short_tagline = models.CharField(max_length=200, help_text="Brief description for cards")
     description_short = models.TextField(help_text="Short description for listings")
-    description_long = models.TextField(help_text="Detailed project description")
+    description_long = RichTextField(help_text="Detailed project description")
     
     # Project details
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='fullstack')
@@ -82,7 +84,7 @@ class Project(TimeStampedModel, SEOModel):
     is_ongoing = models.BooleanField(default=False)
     
     # Media
-    hero_image = models.URLField(blank=True, help_text="Hero image URL")
+    hero_image = VersatileImageField(upload_to='projects/heroes/', null=True, blank=True)
     hero_video = models.URLField(blank=True, help_text="YouTube, Vimeo, or direct video URL")
     gallery_images = models.JSONField(default=list, help_text="List of image URLs")
     
@@ -137,14 +139,14 @@ class CaseStudy(TimeStampedModel, SEOModel):
     project = models.OneToOneField(Project, on_delete=models.CASCADE, related_name='case_study')
     
     # Case study sections
-    problem_statement = models.TextField(help_text="What problem did this project solve?")
-    constraints = models.TextField(blank=True, help_text="Budget, time, technical constraints")
-    approach = models.TextField(help_text="How did you approach the solution?")
-    architecture_description = models.TextField(blank=True, help_text="Technical architecture overview")
-    implementation_notes = models.TextField(blank=True, help_text="Key implementation details")
-    challenges = models.TextField(blank=True, help_text="Major challenges and how they were overcome")
-    results = models.TextField(help_text="Outcomes and metrics")
-    lessons_learned = models.TextField(blank=True, help_text="Key takeaways and learnings")
+    problem_statement = RichTextField(help_text="What problem did this project solve?")
+    constraints = RichTextField(blank=True, help_text="Budget, time, technical constraints")
+    approach = RichTextField(help_text="How did you approach the solution?")
+    architecture_description = RichTextField(blank=True, help_text="Technical architecture overview")
+    implementation_notes = RichTextField(blank=True, help_text="Key implementation details")
+    challenges = RichTextField(blank=True, help_text="Major challenges and how they were overcome")
+    results = RichTextField(help_text="Outcomes and metrics")
+    lessons_learned = RichTextField(blank=True, help_text="Key takeaways and learnings")
     
     # Supporting media
     architecture_images = models.JSONField(default=list, help_text="Architecture diagrams and charts")
@@ -175,7 +177,7 @@ class ProjectUpdate(TimeStampedModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='updates')
     
     title = models.CharField(max_length=255)
-    content = models.TextField()
+    content = RichTextField()
     version = models.CharField(max_length=20, blank=True, help_text="Version number if applicable")
     update_type = models.CharField(
         max_length=20,
@@ -208,7 +210,7 @@ class ProjectCollaboration(TimeStampedModel):
     role = models.CharField(max_length=255)
     contribution = models.TextField(blank=True, help_text="What they contributed to the project")
     profile_url = models.URLField(blank=True, help_text="LinkedIn, GitHub, or portfolio URL")
-    avatar = models.URLField(blank=True, help_text="Avatar image URL")
+    avatar = VersatileImageField(upload_to='collaborators/', null=True, blank=True)
     order = models.PositiveIntegerField(default=0)
     
     class Meta:

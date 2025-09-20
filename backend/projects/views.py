@@ -152,48 +152,10 @@ class AdminProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Admin: Project detail/update/delete"""
     permission_classes = [IsAdminUser]
     queryset = Project.objects.all()
+    serializer_class = ProjectCreateUpdateSerializer
     
     def get_serializer(self, *args, **kwargs):
         if self.request.method == 'GET':
             # Use detail serializer for GET requests
-            return ProjectDetailSerializer(*args, **kwargs)
-        return ProjectCreateUpdateSerializer(*args, **kwargs)
-    
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        
-        if serializer.is_valid():
-            project = serializer.save()
-            
-            # Track project update
-            AnalyticsEvent.objects.create(
-                event_type='admin_project_updated',
-                user=request.user,
-                session_id=request.session.session_key,
-                metadata={
-                    'project_id': project.id,
-                    'project_title': project.title,
-                }
-            )
-            
-            return Response(ProjectDetailSerializer(project).data)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        
-        # Track project deletion
-        AnalyticsEvent.objects.create(
-            event_type='admin_project_deleted',
-            user=request.user,
-            session_id=request.session.session_key,
-            metadata={
-                'project_id': instance.id,
-                'project_title': instance.title,
-            }
-        )
-        
+            kwargs['serializer_class'] = ProjectDetailSerializer
         return super().get_serializer(*args, **kwargs)

@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils import timezone
+from ckeditor.fields import RichTextField
+from versatileimagefield.fields import VersatileImageField
 
 
 class TimeStampedModel(models.Model):
@@ -42,7 +44,7 @@ class RoadmapItem(TimeStampedModel):
     ]
     
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = RichTextField()
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='idea')
     estimated_completion = models.DateField(null=True, blank=True)
@@ -74,7 +76,7 @@ class Achievement(TimeStampedModel):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='technical')
     date_achieved = models.DateField()
     icon = models.CharField(max_length=50, blank=True, help_text="Lucide React icon name")
-    image = models.URLField(blank=True, help_text="Achievement image URL")
+    image = VersatileImageField(upload_to='achievements/', null=True, blank=True)
     url = models.URLField(blank=True, help_text="Link to certificate, article, etc.")
     is_featured = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
@@ -93,7 +95,7 @@ class Testimonial(TimeStampedModel):
     author_name = models.CharField(max_length=255)
     author_role = models.CharField(max_length=255, blank=True)
     author_company = models.CharField(max_length=255, blank=True)
-    author_image = models.URLField(blank=True, help_text="Author image URL")
+    author_image = VersatileImageField(upload_to='testimonials/', null=True, blank=True)
     content = models.TextField()
     rating = models.PositiveSmallIntegerField(
         choices=[(i, i) for i in range(1, 6)], 
@@ -121,7 +123,7 @@ class SiteConfiguration(models.Model):
     hero_text = models.TextField(default="Welcome to my digital realm")
     about_short = models.TextField(help_text="Short bio for cards and previews")
     about_medium = models.TextField(help_text="Medium bio for about page")
-    about_long = models.TextField(help_text="Detailed biography")
+    about_long = RichTextField(help_text="Detailed biography")
     
     # Contact information
     email = models.EmailField()
@@ -156,9 +158,9 @@ class SiteConfiguration(models.Model):
     meta_description = models.TextField(max_length=160, blank=True)
     
     # Images
-    logo = models.URLField(blank=True, help_text="Logo image URL")
-    hero_image = models.URLField(blank=True, help_text="Hero image URL")
-    og_image = models.URLField(blank=True, help_text="Open Graph image URL")
+    logo = VersatileImageField(upload_to='site/', null=True, blank=True)
+    hero_image = VersatileImageField(upload_to='site/', null=True, blank=True)
+    og_image = VersatileImageField(upload_to='site/', null=True, blank=True)
     
     class Meta:
         verbose_name = 'Site Configuration'

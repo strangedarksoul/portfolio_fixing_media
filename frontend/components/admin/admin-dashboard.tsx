@@ -20,7 +20,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useAuthStore } from '@/lib/store';
 import { adminAPI, projectsAPI, gigsAPI } from '@/lib/api';
-import { fileUploadAPI } from '@/lib/api';
 import { analytics } from '@/lib/analytics';
 import { 
   BarChart3, 
@@ -73,8 +72,9 @@ const projectSchema = z.object({
   live_demo_url: z.string().url().optional().or(z.literal('')),
   case_study_url: z.string().url().optional().or(z.literal('')),
   visibility: z.string(),
-  skill_ids: z.array(z.string()).optional(),
+  is_featured: z.boolean(),
   order: z.number().min(0),
+  skill_ids: z.array(z.string()).optional(),
   metrics: z.string().optional(),
 });
 
@@ -141,20 +141,14 @@ interface Project {
   start_date: string;
   end_date?: string;
   is_ongoing: boolean;
-  hero_image?: string;
-  hero_video?: string;
-  gallery_images: string[];
   repo_url?: string;
   live_demo_url?: string;
-  case_study_url?: string;
-  metrics: Record<string, any>;
   visibility: string;
   is_featured: boolean;
   order: number;
   skills: Array<{ id: string; name: string }>;
   view_count: number;
   created_at: string;
-  updated_at: string;
 }
 
 interface Gig {
@@ -236,7 +230,7 @@ export function AdminDashboard() {
       visibility: 'public',
       is_featured: false,
       order: 0,
-      skill_ids: [] as string[],
+      skill_ids: [],
       metrics: '',
     },
   });
@@ -1073,6 +1067,7 @@ export function AdminDashboard() {
                       </div>
                     </div>
                   )}
+                  
                   {selectedProject.hero_video && (
                     <div>
                       <Label className="text-sm font-medium">Current Hero Video</Label>
@@ -1082,7 +1077,7 @@ export function AdminDashboard() {
                           href={selectedProject.hero_video} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-blue-400 hover:underline"
+                          className="text-sm text-blue-400 hover:underline truncate"
                         >
                           {selectedProject.hero_video}
                         </a>
@@ -1095,7 +1090,7 @@ export function AdminDashboard() {
                       <Label className="text-sm font-medium">Current Gallery ({selectedProject.gallery_images.length} images)</Label>
                       <div className="grid grid-cols-3 gap-2 mt-2">
                         {selectedProject.gallery_images.slice(0, 6).map((image, index) => (
-                          <div key={index} className="aspect-square border rounded overflow-hidden">
+                          <div key={index} className="aspect-square overflow-hidden rounded border">
                             <img
                               src={image}
                               alt={`Gallery ${index + 1}`}
@@ -1106,7 +1101,7 @@ export function AdminDashboard() {
                         {selectedProject.gallery_images.length > 6 && (
                           <div className="aspect-square border rounded flex items-center justify-center bg-muted">
                             <span className="text-xs text-muted-foreground">
-                              +{selectedProject.gallery_images.length - 6} more
+                              +{selectedProject.gallery_images.length - 6}
                             </span>
                           </div>
                         )}
