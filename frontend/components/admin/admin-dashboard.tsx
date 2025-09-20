@@ -18,6 +18,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuthStore } from '@/lib/store';
 import { adminAPI, projectsAPI, gigsAPI } from '@/lib/api';
 import { fileUploadAPI } from '@/lib/api';
