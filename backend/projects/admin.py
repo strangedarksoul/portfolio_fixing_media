@@ -57,13 +57,15 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('role', 'start_date', 'end_date', 'is_ongoing', 'skills')
         }),
         ('Media', {
-            'fields': ('hero_image', 'hero_video', 'gallery_images')
+            'fields': ('hero_image', 'hero_video', 'gallery_images'),
+            'classes': ('collapse',)
         }),
         ('Links', {
             'fields': ('repo_url', 'live_demo_url', 'case_study_url')
         }),
         ('Metrics & Impact', {
-            'fields': ('metrics',)
+            'fields': ('metrics',),
+            'classes': ('collapse',)
         }),
         ('Organization', {
             'fields': ('visibility', 'is_featured', 'order')
